@@ -1,8 +1,38 @@
-const Discord = require("discord.js-selfbot-v13") // npm i discord.js-selfbot-v13 (required)
-const client = new Discord.Client({checkUpdate: false})
-const sphinx = require("sphinx-self");
-const keep_alive = require("./keep_alive.js");
+const express = require('express');
+const app = express();
 
-new sphinx.Core(client).leveling({ channel: "1194678276166254652", randomLetters: false, type: 'eng', time: 4000 }) //hover for options
+app.listen(() => console.log('Server started'));
 
-client.login(process.env.TOKEN) //Not saved.
+app.use('/ping', (req, res) => {
+	res.send(new Date());
+});
+
+app.get('/', function(request, response) {
+	response.sendFile(__dirname + '/index.html');
+});
+
+const Discord = require('discord.js-v11-fixes');
+const cmd = require("node-cmd");
+const ffmpeg = require('ffmpeg');
+const ffmpegstatic = require('ffmpeg-static');
+
+const client = new Discord.Client();
+
+const serverid = process.env.server // id server
+const channelid = process.env.channel // id channel
+
+client.on('ready',async () => {
+  console.log("Starting..");
+    let g = client.guilds.get(`${serverid}`);
+    let c = g.channels.get(`${channelid}`);
+      if(c.type === 'voice') {
+       c.join();
+      setInterval(() => {
+        if(g.me.voiceChannel && g.me.voiceChannelID !== c.id || !g.me.voiceChannel) c.join();
+    }, 1);
+      } else {
+    console.log('Failed To Join: \n The Channel Type isn "Listening."')
+  }
+});
+
+client.login(process.env.token);
